@@ -72,7 +72,7 @@ const Reservation = () => {
       const { order } = data;
 
       const options = {
-        key: "rzp_test_RbAGuaW8eICYMe", // Test key
+        key: "rzp_test_Rjwed0WAMV5UmV", // Test key
         amount: order.amount,
         currency: order.currency,
         name: "Baan Nimbus",

@@ -105,25 +105,25 @@ const RoomCard = ({
   return (
     <div className="bg-white border border-gray-300 rounded-xl p-6 flex flex-col md:flex-row gap-8 mb-10 shadow-sm hover:shadow-md transition-all duration-300">
       {/* 🔹 Left - Image Carousel */}
-      <div className="relative w-full md:w-[320px] flex-shrink-0 overflow-hidden rounded-lg">
+        <div className="relative w-full md:w-[550px] h-auto overflow-hidden rounded-lg">
         {images && images.length > 0 ? (
           <>
             <img
               src={`http://localhost:5000${images[currentIndex]}`}
               alt={title}
-              className="w-full h-[230px] object-cover rounded-lg transition-all duration-700"
+              className="w-full h-auto object-cover transition-all duration-700 rounded-lg"
             />
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
               {images.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrentIndex(i)}
-                  className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
+                  className={`h-2 w-2 rounded-full ${
                     i === currentIndex
-                      ? "bg-blue-600 scale-110"
+                      ? "bg-green-700 scale-110"
                       : "bg-gray-400 hover:bg-gray-500"
                   }`}
-                ></button>
+                />
               ))}
             </div>
           </>

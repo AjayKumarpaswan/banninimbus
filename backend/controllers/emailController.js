@@ -5,6 +5,8 @@ export const sendBookingEmail = async (req, res, skipResponse = false) => {
     const booking = req.body;
     const selectedRooms = booking.selectedRooms || [];
 
+
+    console.log("booking",booking.email)
     // Room names separated by commas
     const roomNames = selectedRooms.map(r => r.roomName).join(", ");
 

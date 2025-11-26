@@ -196,7 +196,7 @@ const BookingCard = () => {
     .flatMap((b) => getBookingDays(b));
 
   const sortedPropertyDays = propertyDays.sort((a, b) => a.day - b.day);
-  const displayPropertyDays = sortedPropertyDays.slice(0, 5);
+  const displayPropertyDays = sortedPropertyDays;
 
 
   // Helper: Get "time ago" string

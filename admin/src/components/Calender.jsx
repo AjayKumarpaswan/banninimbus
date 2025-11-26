@@ -34,8 +34,9 @@ const Calendar = () => {
   const [showAllRequests, setShowAllRequests] = useState(false);
 
 
-  
-    const [admin, setAdmin] = useState({ name: "", avatar: "" });
+  const [showAllMessages, setShowAllMessages] = useState(false);
+
+  const [admin, setAdmin] = useState({ name: "", avatar: "" });
   // Fetch data from backend
   useEffect(() => {
     const fetchData = async () => {
@@ -60,13 +61,13 @@ const Calendar = () => {
   }, []);
 
 
-    // admin info
-    useEffect(() => {
-      const storedAdmin = localStorage.getItem("admin"); // key depends on what you stored
-      if (storedAdmin) {
-        setAdmin(JSON.parse(storedAdmin));
-      }
-    }, []);
+  // admin info
+  useEffect(() => {
+    const storedAdmin = localStorage.getItem("admin"); // key depends on what you stored
+    if (storedAdmin) {
+      setAdmin(JSON.parse(storedAdmin));
+    }
+  }, []);
   // Dynamic year based on any booking that matches the month
   const getDynamicYear = () => {
     const filtered = bookings.filter((b) => {
@@ -83,51 +84,85 @@ const Calendar = () => {
   };
 
   const year = getDynamicYear();
-
-  // Filter bookings for selected room & month
-  const filteredBookings = bookings.filter((b) => {
-    const checkin = new Date(b.checkin);
-    const checkout = new Date(b.checkout);
-    return (
-      (!selectedRoom || b.roomName === selectedRoom) &&
-      (checkin.getMonth() === selectedMonth ||
-        checkout.getMonth() === selectedMonth)
-    );
-  });
-
-  // Generate booking days for calendar highlights
-  const getBookingDays = (booking) => {
-    const start = new Date(booking.checkin);
-    const end = new Date(booking.checkout);
-    const days = [];
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      days.push({ ...booking, day: new Date(d) });
-    }
-    return days;
-  };
-
-  const propertyDays = filteredBookings.flatMap((b) => getBookingDays(b));
-  const sortedPropertyDays = propertyDays.sort((a, b) => a.day - b.day);
-  const displayPropertyDays = sortedPropertyDays.slice(0, 5);
-
-  // Calendar logic
+  
+// Calendar logic
   const firstDay = new Date(year, selectedMonth, 1).getDay();
   const daysInMonth = new Date(year, selectedMonth + 1, 0).getDate();
   const daysArray = Array.from({ length: firstDay + daysInMonth }, (_, i) =>
     i < firstDay ? null : i - firstDay + 1
   );
 
-  // Helper function for time ago
-  const getTimeAgo = (dateStr) => {
-    const date = new Date(dateStr);
-    const diff = Math.floor((Date.now() - date.getTime()) / 60000);
-    if (diff < 1) return "Just now";
-    if (diff < 60) return `${diff} min ago`;
-    const hours = Math.floor(diff / 60);
-    if (hours < 24) return `${hours} hr${hours > 1 ? "s" : ""} ago`;
+  useEffect(() => {
+    const fetchBookingsAndRooms = async () => {
+      try {
+        // ✅ Fetch admin bookings
+        const adminRes = await axios.get("http://localhost:5000/api/abookings");
+
+        // ✅ Fetch regular bookings
+        const userRes = await axios.get("http://localhost:5000/api/bookings");
+
+        // ✅ Combine both bookings
+        const combinedBookings = [...adminRes.data, ...userRes.data];
+        setBookings(combinedBookings);
+
+        // ✅ Fetch rooms
+        const roomRes = await axios.get("http://localhost:5000/api/rooms");
+        setRooms(roomRes.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+
+    fetchBookingsAndRooms();
+  }, []);
+
+  // admin info
+  useEffect(() => {
+    const storedAdmin = localStorage.getItem("admin"); // key depends on what you stored
+    if (storedAdmin) {
+      setAdmin(JSON.parse(storedAdmin));
+    }
+  }, []);
+  // 🟢 Generate all days for confirmed bookings
+  const getBookingDays = (booking) => {
+    const start = new Date(booking.checkin);
+    const end = new Date(booking.checkout);
+    const days = [];
+    for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+      days.push({
+        ...booking,
+        day: new Date(d),
+      });
+    }
+    return days;
+  };
+
+  // Flatten all confirmed bookings into individual days
+  const propertyDays = bookings
+    .filter((b) => b.status === "confirmed")
+    .flatMap((b) => getBookingDays(b));
+
+  const sortedPropertyDays = propertyDays.sort((a, b) => a.day - b.day);
+  const displayPropertyDays = sortedPropertyDays;
+
+
+  // Helper: Get "time ago" string
+  const getTimeAgo = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+
+    const minutes = Math.floor(diffMs / 60000);
+    const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
+
+    if (minutes < 1) return "Just now";
+    if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
     return `${days} day${days > 1 ? "s" : ""} ago`;
   };
+
 
   return (
     <main className="min-h-screen bg-gray-50 md:ml-64 px-4 py-6 transition-all duration-300">
@@ -172,9 +207,8 @@ const Calendar = () => {
                 >
                   {selectedRoom || "Select Room"}
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform ${
-                      showRooms ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform ${showRooms ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -187,9 +221,8 @@ const Calendar = () => {
                           setSelectedRoom(room.title);
                           setShowRooms(false);
                         }}
-                        className={`px-4 py-2 cursor-pointer hover:bg-green-100 ${
-                          selectedRoom === room.title ? "font-semibold" : ""
-                        }`}
+                        className={`px-4 py-2 cursor-pointer hover:bg-green-100 ${selectedRoom === room.title ? "font-semibold" : ""
+                          }`}
                       >
                         {room.title}
                       </div>
@@ -242,8 +275,8 @@ const Calendar = () => {
                         b.day.getDate() === day &&
                         b.day.getMonth() === selectedMonth
                     ) && (
-                      <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-yellow-400"></span>
-                    )}
+                        <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-yellow-400"></span>
+                      )}
                   </div>
                 ) : (
                   <div key={i}></div>
@@ -253,11 +286,12 @@ const Calendar = () => {
           </div>
         </div>
 
-        {/* RIGHT SIDE: Sidebar */}
-        <div className="w-full lg:w-[350px] h-screen bg-white rounded-2xl shadow-md p-6 space-y-6 overflow-y-auto">
+        {/* 🧱 Right Sidebar Section */}
+        <div className="w-full h-screen lg:w-[350px] bg-white rounded-2xl shadow-md p-6 space-y-6 overflow-y-auto">
+
           {/* Profile */}
           <div className="flex items-center justify-between">
-           <div>
+            <div>
               <h2 className="text-lg font-semibold">{admin.name || "Property Manager"}</h2>
               <p className="text-sm text-gray-500">Property Manager</p>
             </div>
@@ -275,45 +309,52 @@ const Calendar = () => {
           </div>
 
           {/* Property On Hold */}
-<div>
-  <div className="flex items-center justify-between mb-3">
-    <h3 className="font-semibold text-gray-800">Property On Hold</h3>
-    <MoreHorizontal className="text-gray-500 w-5 h-5" />
-  </div>
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-gray-800">Property On Hold</h3>
+              <MoreHorizontal className="text-gray-500 " />
+            </div>
 
-  {/* Small screens: grid layout */}
-  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:hidden">
-    {displayPropertyDays.map((b, index) => (
-      <div
-        key={index}
-        className="bg-green-900 text-white rounded-xl p-3 flex flex-col items-center"
-      >
-        <p className="text-xs opacity-80">
-          {b.day.toLocaleString("default", { month: "long", year: "numeric" })}
-        </p>
-        <p className="text-2xl font-bold">{b.day.getDate()}</p>
-        <p className="text-xs mt-1">{b.roomName}</p>
-      </div>
-    ))}
-  </div>
+            {/* Small screens: grid layout */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:hidden">
+              {displayPropertyDays.map((b, index) => (
+                <div
+                  key={index}
+                  className="bg-green-900 text-white rounded-xl p-3 flex flex-col items-center"
+                >
+                  <p className="text-xs opacity-80 text-center">
+                    {b.day.toLocaleString("default", { month: "short", year: "numeric" })}
+                  </p>
+                  <p className="text-2xl font-bold">{b.day.getDate()}</p>
+                  <p className="text-center text-sm">
+                    {b.selectedRooms && b.selectedRooms.length > 0
+                      ? b.selectedRooms.map((r) => r.roomName).join(", ")
+                      : b.roomName || b.roomNames || "N/A"}
+                  </p>
+                </div>
+              ))}
+            </div>
 
-  {/* Large screens: horizontal scroll */}
-  <div className="hidden md:flex items-center gap-3 overflow-x-auto">
-    {displayPropertyDays.map((b, index) => (
-      <div
-        key={index}
-        className="bg-green-900 text-white rounded-xl p-3 flex flex-col items-center min-w-[80px] flex-shrink-0"
-      >
-        <p className="text-xs opacity-80">
-          {b.day.toLocaleString("default", { month: "long", year: "numeric" })}
-        </p>
-        <p className="text-2xl font-bold">{b.day.getDate()}</p>
-        <p className="text-xs mt-1">{b.roomName}</p>
-      </div>
-    ))}
-  </div>
-</div>
-
+            {/* Large screens: horizontal scroll */}
+            <div className="hidden md:flex items-center gap-3 overflow-x-auto">
+              {displayPropertyDays.map((b, index) => (
+                <div
+                  key={index}
+                  className="bg-green-900 text-white rounded-xl p-3 flex flex-col items-center min-w-[100px] flex-shrink-0"
+                >
+                  <p className="text-xs opacity-80 text-center">
+                    {b.day.toLocaleString("default", { month: "long", year: "numeric" })}
+                  </p>
+                  <p className="text-2xl font-bold">{b.day.getDate()}</p>
+                  <p className="text-center text-sm">
+                    {b.selectedRooms && b.selectedRooms.length > 0
+                      ? b.selectedRooms.map((r) => r.roomName).join(", ")
+                      : b.roomName || b.roomNames || "N/A"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
 
           {/* Recent Requests */}
           <div>
@@ -349,9 +390,7 @@ const Calendar = () => {
                   </div>
                 ))}
 
-              {bookings.filter(
-                (b) => b.specialRequest && b.specialRequest.trim() !== ""
-              ).length > 3 && (
+              {bookings.filter((b) => b.specialRequest && b.specialRequest.trim() !== "").length > 3 && (
                 <button
                   onClick={() => setShowAllRequests(!showAllRequests)}
                   className="text-sm text-green-900 font-medium mt-2 hover:underline"
@@ -359,48 +398,64 @@ const Calendar = () => {
                   {showAllRequests ? "Show Less" : "Show More..."}
                 </button>
               )}
+
+              {bookings.filter((b) => b.specialRequest && b.specialRequest.trim() !== "").length === 0 && (
+                <p className="text-sm text-gray-500">No special requests</p>
+              )}
             </div>
           </div>
 
-          {/* Messages Section */}
+          {/* Messages */}
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-gray-800">Messages</h3>
               <MoreHorizontal className="text-gray-500 w-5 h-5" />
             </div>
 
-            {bookings
-              .filter((b) => b.specialRequest && b.specialRequest.trim() !== "")
-              .slice(0, 3)
-              .map((b) => (
-                <div
-                  key={b._id}
-                  className="flex items-start gap-3 bg-green-900 text-white p-4 rounded-xl mb-3"
-                >
-                  <img
-                    src={
-                      b.avatar
-                        ? b.avatar.startsWith("http")
-                          ? b.avatar
-                          : `http://localhost:5000${b.avatar}`
-                        : "https://i.pravatar.cc/100?img=5"
-                    }
-                    alt="Profile"
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                  <div>
-                    <p className="font-medium">{b.name}</p>
-                    <div className="flex items-center gap-1 text-xs opacity-90">
-                      <Clock className="w-3 h-3" /> {getTimeAgo(b.checkin)}
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {bookings
+                .filter((b) => b.specialRequest && b.specialRequest.trim() !== "")
+                .slice(0, showAllMessages ? undefined : 3)
+                .map((b) => (
+                  <div
+                    key={b._id}
+                    className="flex items-start gap-3 bg-green-900 text-white p-4 rounded-xl"
+                  >
+                    <img
+                      src={
+                        b.avatar
+                          ? b.avatar.startsWith("http")
+                            ? b.avatar
+                            : `http://localhost:5000${b.avatar}`
+                          : "https://i.pravatar.cc/100?img=1"
+                      }
+                      alt={b.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <div>
+                      <p className="font-medium">{b.name}</p>
+                      <div className="flex items-center gap-1 text-xs opacity-90">
+                        <Clock className="w-3 h-3" />
+                        {getTimeAgo(b.checkin)}
+                      </div>
+                      <p className="text-sm mt-2 opacity-95">{b.specialRequest}</p>
                     </div>
-                    <p className="text-sm mt-2 opacity-95">
-                      {b.specialRequest}
-                    </p>
                   </div>
-                </div>
-              ))}
+                ))}
+
+              {bookings.filter((b) => b.specialRequest && b.specialRequest.trim() !== "").length > 3 && (
+                <button
+                  onClick={() => setShowAllMessages(!showAllMessages)}
+                  className="text-sm text-green-900 font-medium mt-2 hover:underline"
+                >
+                  {showAllMessages ? "Show Less" : "Show More..."}
+                </button>
+              )}
+            </div>
           </div>
+
         </div>
+
       </div>
     </main>
   );

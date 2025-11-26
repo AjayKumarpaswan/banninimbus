@@ -56,6 +56,15 @@ export const register = async (req, res) => {
   }
 };
 
+//check email exist or not
+ export const checkemail=async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  res.json({ exists: !!user });
+};
+
+// router.post("/check-email",
+
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;

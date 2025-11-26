@@ -1,12 +1,13 @@
 // routes/authRoutes.js
 import express from "express";
-import { login, register,deleteUser, googleLogin } from "../controllers/authController.js";
+import { login, register,deleteUser, googleLogin, checkemail } from "../controllers/authController.js";
 import upload from "../middleware/upload.js";
 const router = express.Router();
 
 router.post("/register", upload.single("avatar"), register);
 router.post("/login", login);
 router.post("/google", googleLogin);
+router.post("/check-email",checkemail)
 
 router.delete("/delete/:id", deleteUser); 
 

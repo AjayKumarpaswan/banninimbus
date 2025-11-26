@@ -21,22 +21,22 @@ const Payment = () => {
   const roomNames = totals.roomNames; // already comma-separated
 
   // Calculate totals
- const checkinDate = new Date(paymentData.checkin);
-const checkoutDate = new Date(paymentData.checkout);
+  const checkinDate = new Date(paymentData.checkin);
+  const checkoutDate = new Date(paymentData.checkout);
 
-const nights = Math.max(
-  1,
-  Math.ceil((checkoutDate.getTime() - checkinDate.getTime()) / (1000 * 60 * 60 * 24))
-);
+  const nights = Math.max(
+    1,
+    Math.ceil((checkoutDate.getTime() - checkinDate.getTime()) / (1000 * 60 * 60 * 24))
+  );
 
 
   // ✅ Fix extraChildCharge
-const extraChildCharge = paymentData.extraChildCharge || 0;
+  const extraChildCharge = paymentData.extraChildCharge || 0;
 
-const numericBaseRate = paymentData.selectedRooms.reduce((acc, room) => {
-  const price = Number(room.price.replace(/[^0-9]/g, "")) || 0;
-  return acc + price;
-}, 0);
+  const numericBaseRate = paymentData.selectedRooms.reduce((acc, room) => {
+    const price = Number(room.price.replace(/[^0-9]/g, "")) || 0;
+    return acc + price;
+  }, 0);
 
   console.log("extraChildCharge:", extraChildCharge);
 
@@ -44,6 +44,9 @@ const numericBaseRate = paymentData.selectedRooms.reduce((acc, room) => {
   const baseTotal = nights * numericBaseRate + nights * extraChildCharge;
   const taxes = baseTotal * gstRate;
   const totalAmount = baseTotal + taxes;
+
+  const advanceAmount = totalAmount * 0.5;  // 50% advance
+
 
   // Images: show first room's first image
   const images =
@@ -53,7 +56,7 @@ const numericBaseRate = paymentData.selectedRooms.reduce((acc, room) => {
     ? `http://localhost:5000${images[0]}`
     : "/assets/default-room.jpg";
 
- 
+
 
   // Load Razorpay script dynamically
   const loadScript = (src) =>
@@ -85,7 +88,7 @@ const numericBaseRate = paymentData.selectedRooms.reduce((acc, room) => {
       if (!data.success) return alert("Failed to create Razorpay order");
 
       const options = {
-        key: "rzp_test_RbAGuaW8eICYMe",
+        key: "rzp_test_Rjwed0WAMV5UmV",
         amount: data.order.amount,
         currency: data.order.currency,
         name: "Baan Nimbus",
@@ -111,8 +114,15 @@ const numericBaseRate = paymentData.selectedRooms.reduce((acc, room) => {
           if (verify.success) {
             alert("✅ Payment Successful!");
             navigate("/booking-confirm", {
-              state: { ...paymentData, paymentId: response.razorpay_payment_id,totalAmount} // ✅ Add this line },
+              state: {
+                ...paymentData,
+                paymentId: response.razorpay_payment_id,
+                advanceAmount,
+                remainingAmount: totalAmount - advanceAmount,
+                totalAmount
+              },
             });
+
           } else {
             alert("❌ Payment verification failed.");
           }
@@ -182,11 +192,12 @@ const numericBaseRate = paymentData.selectedRooms.reduce((acc, room) => {
               <p>Razor Pay</p>
               <div className="flex justify-center">
                 <button
-                  onClick={() => handlePayment(totalAmount)}
+                  onClick={() => handlePayment(advanceAmount)}
                   className="bg-[#063D2C] text-white text-[15px] px-12 py-2 rounded-md font-medium tracking-wide"
                 >
-                  Pay ₹{totalAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                  Pay Advance ₹{advanceAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                 </button>
+
               </div>
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 bg-white rounded-full border border-gray-400 w-3 h-3"></div>
             </div>
