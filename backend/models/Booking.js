@@ -18,6 +18,8 @@ const BookingSchema = new mongoose.Schema(
     pets: { type: Number, default: 0 },
     extraChildCharge: { type: Number, default: 0 },
     roomNames: { type: String, required: true },
+    remainingAmount: { type: Number, default: 0 },   // ✅ ADD THIS
+    advanceAmount: { type: Number, default: 0 }, 
     selectedRooms: {
       type: [
         {

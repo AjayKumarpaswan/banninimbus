@@ -15,7 +15,9 @@ const BookingCard = () => {
 
   const [showAllRequests, setShowAllRequests] = useState(false);
   const [showAllMessages, setShowAllMessages] = useState(false);
-
+// ADD THIS
+const [selectedBooking, setSelectedBooking] = useState(null);
+const [showGuestModal, setShowGuestModal] = useState(false);
 
   const [admin, setAdmin] = useState({ name: "", avatar: "" });
 
@@ -216,6 +218,11 @@ const BookingCard = () => {
     return `${days} day${days > 1 ? "s" : ""} ago`;
   };
 
+  const handleGuestClick = (booking) => {
+  setSelectedBooking(booking);   // store data
+  setShowGuestModal(true);       // open modal
+};
+
 
   return (
 
@@ -271,6 +278,7 @@ const BookingCard = () => {
               {bookings.map((booking) => (
                 <div
                   key={booking._id}
+                  onClick={() => handleGuestClick(booking)} 
                   className="border border-green-400 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between hover:bg-green-800 transition"
                 >
                   <div>
@@ -704,6 +712,29 @@ const BookingCard = () => {
           </div>
         </div>
       )}
+
+{/* booking details of all guest */}
+{showGuestModal && selectedBooking && (
+  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+    <div className="bg-white p-6 rounded-xl w-full max-w-lg">
+      <h2 className="text-xl font-bold mb-4">Guest Details</h2>
+
+      <p><strong>Name:</strong> {selectedBooking.name}</p>
+      <p><strong>Email:</strong> {selectedBooking.email || "N/A"}</p>
+      <p><strong>Phone:</strong> {selectedBooking.phone || "N/A"}</p>
+      <p><strong>Rooms:</strong> {selectedBooking.roomNames || selectedBooking.roomName}</p>
+      <p><strong>Check-in:</strong> {selectedBooking.checkin}</p>
+      <p><strong>Check-out:</strong> {selectedBooking.checkout}</p>
+
+      <button
+        className="mt-4 bg-green-900 text-white px-4 py-2 rounded-lg"
+        onClick={() => setShowGuestModal(false)}
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
 
     </main>
   );

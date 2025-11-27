@@ -99,14 +99,21 @@ const BookingStep = () => {
                 )}
               </div>
 
+              {/* ================== FIX ADDED HERE ================== */}
               <button
-                onClick={() =>
-                  navigate("/next-step", { state: { selectedRooms, totals } })
-                }
+                onClick={() => {
+                  if (!user) {
+                    alert("Please login first");
+                    setShowPopup(true);
+                    return;
+                  }
+                  navigate("/next-step", { state: { selectedRooms, totals } });
+                }}
                 className="bg-[#063D2C] text-white px-6 py-2 rounded-md hover:bg-green-900 transition ml-auto block"
               >
                 NEXT
               </button>
+              {/* =================================================== */}
             </div>
 
             <p className="text-gray-700 text-sm mt-6 md:mt-10 text-center md:text-left leading-relaxed">
@@ -197,9 +204,7 @@ const GuestPopup = ({ onClose, onSuccess }) => {
       alert("Logged in successfully!");
       onClose();
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Login failed"
-      );
+      setError(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -305,15 +310,13 @@ const GuestPopup = ({ onClose, onSuccess }) => {
               required
             />
 
-            <button
-              className="w-full bg-green-700 text-white py-2 rounded-md hover:bg-green-800"
-            >
+            <button className="w-full bg-green-700 text-white py-2 rounded-md hover:bg-green-800">
               Continue
             </button>
           </form>
         )}
 
-        {/* LOGIN FORM (IF EMAIL EXISTS) */}
+        {/* LOGIN FORM */}
         {step === "login" && (
           <form onSubmit={handleLogin} className="space-y-4">
             <input
@@ -333,15 +336,13 @@ const GuestPopup = ({ onClose, onSuccess }) => {
               required
             />
 
-            <button
-              className="w-full bg-green-700 text-white py-2 rounded-md hover:bg-green-800"
-            >
+            <button className="w-full bg-green-700 text-white py-2 rounded-md hover:bg-green-800">
               {loading ? "Logging in..." : "Login"}
             </button>
           </form>
         )}
 
-        {/* REGISTER FORM (IF EMAIL NOT EXISTS) */}
+        {/* REGISTER FORM */}
         {step === "register" && (
           <form onSubmit={handleRegister} className="space-y-4">
             <input
@@ -378,7 +379,6 @@ const GuestPopup = ({ onClose, onSuccess }) => {
               required
             />
 
-            {/* Avatar */}
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 shadow-sm">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Profile Picture
@@ -415,9 +415,7 @@ const GuestPopup = ({ onClose, onSuccess }) => {
               </div>
             </div>
 
-            <button
-              className="w-full bg-green-700 text-white py-2 rounded-md hover:bg-green-800"
-            >
+            <button className="w-full bg-green-700 text-white py-2 rounded-md hover:bg-green-800">
               {loading ? "Saving..." : "Register"}
             </button>
           </form>

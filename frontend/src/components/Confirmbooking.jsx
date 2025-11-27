@@ -90,6 +90,9 @@ const Confirmbooking = () => {
     paymentId: bookingData.paymentId,
     specialRequest: bookingData.specialRequest || "",
     totalAmount,
+    advanceAmount: bookingData.advanceAmount || 0,       // ✅ ADD THIS
+    remainingAmount: bookingData.remainingAmount || 0,   // ✅ ADD THIS
+
     adults: bookingData.adults || 0,
     kids: bookingData.kids || 0,
     kidsAges: bookingData.kidsAges || [],
