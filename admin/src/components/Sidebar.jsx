@@ -20,7 +20,7 @@ const Sidebar = () => {
   const location = useLocation();
 
   const topMenu = [
-    { name: "Bookings", icon: <BookOpen />, path: "/" },
+    { name: "Bookings", icon: <BookOpen />, path: "/booking" },
     { name: "Calendar", icon: <Calendar />, path: "/calendar" },
     { name: "Guests", icon: <Users />, path: "/guests" },
     { name: "Message", icon: <MessageSquare />, path: "/messages" },

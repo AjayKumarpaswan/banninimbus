@@ -715,26 +715,186 @@ const [showGuestModal, setShowGuestModal] = useState(false);
 
 {/* booking details of all guest */}
 {showGuestModal && selectedBooking && (
-  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-    <div className="bg-white p-6 rounded-xl w-full max-w-lg">
-      <h2 className="text-xl font-bold mb-4">Guest Details</h2>
+  <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center p-4">
 
-      <p><strong>Name:</strong> {selectedBooking.name}</p>
-      <p><strong>Email:</strong> {selectedBooking.email || "N/A"}</p>
-      <p><strong>Phone:</strong> {selectedBooking.phone || "N/A"}</p>
-      <p><strong>Rooms:</strong> {selectedBooking.roomNames || selectedBooking.roomName}</p>
-      <p><strong>Check-in:</strong> {selectedBooking.checkin}</p>
-      <p><strong>Check-out:</strong> {selectedBooking.checkout}</p>
+    {/* SCROLLABLE CONTAINER */}
+    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 relative">
 
-      <button
-        className="mt-4 bg-green-900 text-white px-4 py-2 rounded-lg"
-        onClick={() => setShowGuestModal(false)}
-      >
-        Close
-      </button>
+      <h2 className="text-2xl font-bold text-green-900 mb-6 text-center">
+        Guest Verification
+      </h2>
+
+      {/* GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <div>
+          <label className="text-gray-600 text-sm">Booking ID</label>
+          <input
+            value={selectedBooking._id || "N/A"}
+            className="w-full p-3 bg-gray-100 rounded-lg border"
+            readOnly
+          />
+        </div>
+
+        <div>
+          <label className="text-gray-600 text-sm">Guest Name</label>
+          <input
+            value={selectedBooking.name || "N/A"}
+            className="w-full p-3 bg-gray-100 rounded-lg border"
+            readOnly
+          />
+        </div>
+
+        <div>
+          <label className="text-gray-600 text-sm">Email</label>
+          <input
+            value={selectedBooking.email || "N/A"}
+            className="w-full p-3 bg-gray-100 rounded-lg border"
+            readOnly
+          />
+        </div>
+
+        <div>
+          <label className="text-gray-600 text-sm">Phone</label>
+          <input
+            value={selectedBooking.phone || "N/A"}
+            className="w-full p-3 bg-gray-100 rounded-lg border"
+            readOnly
+          />
+        </div>
+
+        <div>
+          <label className="text-gray-600 text-sm">Room Name</label>
+          <input
+            value={
+              selectedBooking.roomNames ||
+              selectedBooking.roomName ||
+              "N/A"
+            }
+            className="w-full p-3 bg-gray-100 rounded-lg border"
+            readOnly
+          />
+        </div>
+
+        <div>
+          <label className="text-gray-600 text-sm">Status</label>
+          <input
+            value={selectedBooking.status || "N/A"}
+            className="w-full p-3 bg-gray-100 rounded-lg border capitalize"
+            readOnly
+          />
+        </div>
+
+        <div>
+          <label className="text-gray-600 text-sm">Check-in</label>
+          <input
+            value={
+              selectedBooking.checkin
+                ? new Date(selectedBooking.checkin).toLocaleDateString()
+                : "N/A"
+            }
+            className="w-full p-3 bg-gray-100 rounded-lg border"
+            readOnly
+          />
+        </div>
+
+        <div>
+          <label className="text-gray-600 text-sm">Check-out</label>
+          <input
+            value={
+              selectedBooking.checkout
+                ? new Date(selectedBooking.checkout).toLocaleDateString()
+                : "N/A"
+            }
+            className="w-full p-3 bg-gray-100 rounded-lg border"
+            readOnly
+          />
+        </div>
+
+        <div>
+          <label className="text-gray-600 text-sm">Adults</label>
+          <input
+            value={selectedBooking.adults ?? "N/A"}
+            className="w-full p-3 bg-gray-100 rounded-lg border"
+            readOnly
+          />
+        </div>
+
+        <div>
+          <label className="text-gray-600 text-sm">Kids</label>
+          <input
+            value={selectedBooking.kids ?? "0"}
+            className="w-full p-3 bg-gray-100 rounded-lg border"
+            readOnly
+          />
+        </div>
+
+        <div>
+          <label className="text-gray-600 text-sm">Pets</label>
+          <input
+            value={selectedBooking.pets ?? "0"}
+            className="w-full p-3 bg-gray-100 rounded-lg border"
+            readOnly
+          />
+        </div>
+
+        {/* PAYMENT SECTION */}
+        {selectedBooking.totalAmount !== undefined && (
+          <>
+            <div>
+              <label className="text-gray-600 text-sm">Total Amount</label>
+              <input
+                value={selectedBooking.totalAmount}
+                className="w-full p-3 bg-gray-100 rounded-lg border"
+                readOnly
+              />
+            </div>
+
+            <div>
+              <label className="text-gray-600 text-sm">Advance Paid</label>
+              <input
+                value={selectedBooking.advanceAmount}
+                className="w-full p-3 bg-gray-100 rounded-lg border"
+                readOnly
+              />
+            </div>
+
+            <div>
+              <label className="text-gray-600 text-sm">Remaining Amount</label>
+              <input
+                value={selectedBooking.remainingAmount}
+                className="w-full p-3 bg-gray-100 rounded-lg border"
+                readOnly
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="text-gray-600 text-sm">Special Request</label>
+              <textarea
+                value={selectedBooking.specialRequest || "None"}
+                className="w-full p-3 bg-gray-100 rounded-lg border h-20"
+                readOnly
+              ></textarea>
+            </div>
+          </>
+        )}
+
+      </div>
+
+      <div className="mt-6 flex justify-center">
+        <button
+          onClick={() => setShowGuestModal(false)}
+          className="px-6 py-3 bg-green-800 text-white rounded-xl hover:bg-green-900 transition"
+        >
+          Close
+        </button>
+      </div>
+
     </div>
   </div>
 )}
+
+
 
     </main>
   );

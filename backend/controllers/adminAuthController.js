@@ -31,7 +31,7 @@ export const registerAdmin = async (req, res) => {
       name,
       email,
       phone,
-      role: role || "admin",
+      role: role,
       password_hash: password,
       avatar,
     });
@@ -130,7 +130,7 @@ export const googleLoginAdmin = async (req, res) => {
         name: name || "No Name",
         email,
         phone: "",
-        role: "admin", // default
+        role: "user", // default
         password_hash: googleId, // store googleId as hashed password
         avatar: avatar || "",
       });
