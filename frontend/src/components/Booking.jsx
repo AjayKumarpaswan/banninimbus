@@ -1,6 +1,7 @@
 // src/pages/Booking.jsx
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const Booking = () => {
   const location = useLocation();
@@ -39,7 +40,7 @@ const Booking = () => {
       setLoading(true);
 
       // Step 1: Register guest
-      const userRes = await fetch("http://localhost:5000/api/auth/register", {
+      const userRes = await fetch(`${apiUrl}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -60,7 +61,7 @@ const Booking = () => {
       const guest_id = userData.user?.id || userData._id;
 
       // Step 2: Create booking
-      const bookingRes = await fetch("http://localhost:5000/api/bookings", {
+      const bookingRes = await fetch(`${apiUrl}/api/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -112,7 +113,7 @@ const Booking = () => {
           {room.images?.map((img, i) => (
             <img
               key={i}
-              src={`http://localhost:5000${img}`}
+              src={`${apiUrl}${img}`}
               alt={room.name}
               className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
                 i === currentImage ? "opacity-100" : "opacity-0"

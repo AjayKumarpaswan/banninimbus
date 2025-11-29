@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { User, LogOut } from "lucide-react";
 
+
+const apiUrl = import.meta.env.VITE_API_URL;
 const Reservation = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -45,7 +47,7 @@ const Reservation = () => {
     if (!res) return alert("Razorpay SDK failed to load.");
 
     try {
-      const response = await fetch("http://localhost:5000/api/payment/create-order", {
+      const response = await fetch(`${apiUrl}/api/payment/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount }),
@@ -63,7 +65,7 @@ const Reservation = () => {
         description: "Room Reservation Payment",
         order_id: order.id,
         handler: async (response) => {
-          const verifyRes = await fetch("http://localhost:5000/api/payment/verify", {
+          const verifyRes = await fetch(`${apiUrl}/api/payment/verify`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(response),
@@ -277,7 +279,7 @@ const GuestPopup = ({ onClose, onSuccess }) => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
+      const res = await fetch(`${apiUrl}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

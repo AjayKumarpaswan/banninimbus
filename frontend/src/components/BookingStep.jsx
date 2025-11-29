@@ -4,6 +4,8 @@ import { GoogleLogin } from "@react-oauth/google";
 import { User, LogOut } from "lucide-react";
 import axios from "axios";
 
+
+const apiUrl = import.meta.env.VITE_API_URL;
 const BookingStep = () => {
   const navigate = useNavigate();
 
@@ -67,7 +69,7 @@ const BookingStep = () => {
                             src={
                               user.avatar.startsWith("http")
                                 ? user.avatar
-                                : `http://localhost:5000${user.avatar}`
+                                : `${apiUrl}${user.avatar}`
                             }
                             alt={user.name}
                             className="w-full h-full object-cover"
@@ -170,7 +172,7 @@ const GuestPopup = ({ onClose, onSuccess }) => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/check-email",
+        `${apiUrl}/api/auth/check-email`,
         { email: form.email }
       );
 
@@ -194,7 +196,7 @@ const GuestPopup = ({ onClose, onSuccess }) => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        `${apiUrl}/api/auth/login`,
         { email: form.email, password: form.password }
       );
 
@@ -224,7 +226,7 @@ const GuestPopup = ({ onClose, onSuccess }) => {
       fd.append("password", form.password);
       if (form.avatar) fd.append("avatar", form.avatar);
 
-      const res = await fetch("http://localhost:5000/api/auth/register", {
+      const res = await fetch(`${apiUrl}/api/auth/register`, {
         method: "POST",
         body: fd,
       });
@@ -253,7 +255,7 @@ const GuestPopup = ({ onClose, onSuccess }) => {
     try {
       const token = credentialResponse.credential;
       const res = await axios.post(
-        "http://localhost:5000/api/auth/google",
+        `${apiUrl}/api/auth/google`,
         { token }
       );
 

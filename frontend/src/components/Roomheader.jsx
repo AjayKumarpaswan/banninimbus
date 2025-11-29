@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-
+const apiUrl = import.meta.env.VITE_API_URL;
 const Roomheader = () => {
   const location = useLocation();
   const formData = location.state || {
@@ -22,7 +22,7 @@ const Roomheader = () => {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/rooms");
+        const res = await axios.get(`${apiUrl}/api/rooms`);
         setRooms(res.data || []);
       } catch (error) {
         console.error("Error fetching rooms:", error);
@@ -109,7 +109,7 @@ const RoomCard = ({
         {images && images.length > 0 ? (
           <>
             <img
-              src={`http://localhost:5000${images[currentIndex]}`}
+              src={`${apiUrl}${images[currentIndex]}`}
               alt={title}
               className="w-full h-auto object-cover transition-all duration-700 rounded-lg"
             />

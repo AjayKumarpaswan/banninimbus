@@ -4,7 +4,7 @@ import { User, LogOut } from "lucide-react";
 import logo from "/assets/home__logo--white.png";
 import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
-
+const apiUrl = import.meta.env.VITE_API_URL;
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
@@ -64,7 +64,7 @@ const Header = () => {
                     src={
                       user.avatar.startsWith("http")
                         ? user.avatar // full URL from Google
-                        : `http://localhost:5000${user.avatar}` // local upload
+                        : `${apiUrl}${user.avatar}` // local upload
                     }
                     alt={user.name}
                     className="w-full h-full object-cover"
@@ -131,7 +131,7 @@ const Header = () => {
                     src={
                       user.avatar.startsWith("http")
                         ? user.avatar // full URL from Google
-                        : `http://localhost:5000${user.avatar}` // local upload
+                        : `${apiUrl}${user.avatar}` // local upload
                     }
                     alt={user.name}
                     className="w-full h-full object-cover"
@@ -210,7 +210,7 @@ const GuestPopup = ({ onClose, onSuccess }) => {
       formData.append("password", form.password);
       if (form.avatar) formData.append("avatar", form.avatar);
 
-      const res = await fetch("http://localhost:5000/api/auth/register", {
+      const res = await fetch(`${apiUrl}/api/auth/register`, {
         method: "POST",
         body: formData,
       });
@@ -237,7 +237,7 @@ const GuestPopup = ({ onClose, onSuccess }) => {
   const handleGoogleLogin = async (credentialResponse) => {
     try {
       const token = credentialResponse.credential;
-      const res = await axios.post("http://localhost:5000/api/auth/google", { token });
+      const res = await axios.post(`${api}/api/auth/google`, { token });
       const user = res.data.user;
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("token", res.data.token);

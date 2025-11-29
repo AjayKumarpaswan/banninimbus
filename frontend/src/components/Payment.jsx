@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { User } from "lucide-react";
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -53,7 +55,7 @@ const Payment = () => {
     paymentData.selectedRooms[0]?.images || ["/assets/default-room.jpg"];
 
   const roomImage = images[0]
-    ? `http://localhost:5000${images[0]}`
+    ? `${apiUrl}${images[0]}`
     : "/assets/default-room.jpg";
 
 
@@ -77,7 +79,7 @@ const Payment = () => {
 
     try {
       const orderRes = await fetch(
-        "http://localhost:5000/api/payment/create-order",
+        `${apiUrl}/api/payment/create-order`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -103,7 +105,7 @@ const Payment = () => {
         theme: { color: "#063D2C" },
         handler: async (response) => {
           const verifyRes = await fetch(
-            "http://localhost:5000/api/payment/verify",
+            `${apiUrl}/api/payment/verify`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },

@@ -1,8 +1,11 @@
 import twilio from "twilio";
 
 export const sendBookingWhatsApp = async (req, res, skipResponse = false) => {
+
   try {
     const booking = req.body;
+    
+     
     const selectedRooms = booking.selectedRooms || [];
 
     // Room names separated by commas
@@ -33,6 +36,10 @@ export const sendBookingWhatsApp = async (req, res, skipResponse = false) => {
     const taxes = totalBaseAmount * gstRate;
     const totalAmount = totalBaseAmount + taxes;
 
+   const advanceAmount = Number(booking.advanceAmount) || 0;
+const remainingAmount = Number(booking.remainingAmount) || 0;
+
+
     // Create WhatsApp message
     const messageBody = `
 📢 *Booking Confirmation*
@@ -50,7 +57,9 @@ Thank you for booking *${roomNames}* with *Baan Nimbus*! 🌿
 💰 *Price Summary:*  
 - Rooms: ₹${(nights * baseTotal).toLocaleString("en-IN")}  
 - Extra Child Charges: ₹${(nights * extraChildCharge).toLocaleString("en-IN")}  
-- Taxes & Fees (18% GST): ₹${taxes.toLocaleString("en-IN", { minimumFractionDigits: 2 })}  
+- Taxes & Fees (18% GST): ₹${taxes.toLocaleString("en-IN", { minimumFractionDigits: 2 })} 
+- Advance Payment: ₹${advanceAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}  
+- Remaining Amount to be paid: ₹${remainingAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}  
 *Total Amount:* ₹${totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}  
 
 *Policies:*  

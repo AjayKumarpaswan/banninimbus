@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
 import axios from "axios";
-
+const apiUrl = import.meta.env.VITE_API_URL;
 const Confirmbooking = () => {
     const location = useLocation();
     const bookingData = location.state || {};
@@ -16,7 +16,7 @@ const Confirmbooking = () => {
     // First room's first image for display
     const roomImage =
         selectedRooms[0]?.images?.[0]
-            ? `http://localhost:5000${selectedRooms[0].images[0]}`
+            ? `${apiUrl}${selectedRooms[0].images[0]}`
             : "/assets/default-room.jpg";
 
     const checkinDate = new Date(bookingData.checkin);
@@ -54,7 +54,7 @@ const Confirmbooking = () => {
     useEffect(() => {
         const markRoomUnavailable = async (roomId) => {
             try {
-                await axios.put(`http://localhost:5000/api/rooms/${roomId}/status`, {
+                await axios.put(`${apiUrl}/api/rooms/${roomId}/status`, {
                     status: "unavailable",
                 });
                 console.log(`✅ Room ${roomId} marked unavailable`);
@@ -65,7 +65,7 @@ const Confirmbooking = () => {
 
         if (bookingData.email) {
             axios
-                .post("http://localhost:5000/api/send-booking-confirmation", bookingData)
+                .post(`${apiUrl}/api/send-booking-confirmation`, bookingData)
                 .then((res) => {
                     console.log("📩 Booking confirmation email sent!");
                     selectedRooms.forEach((room) => markRoomUnavailable(room.roomId));
@@ -79,41 +79,41 @@ const Confirmbooking = () => {
         const saveBooking = async () => {
             if (!selectedRooms.length) return;
 
-        const bookingPayload = {
-    name: bookingData.name || user.name,
-    email: bookingData.email || user.email,
-    phone: bookingData.phone || user.phone,
-    avatar: user.avatar || "",
-    checkin: bookingData.checkin,
-    checkout: bookingData.checkout,
-    nights,
-    paymentId: bookingData.paymentId,
-    specialRequest: bookingData.specialRequest || "",
-    totalAmount,
-    advanceAmount: bookingData.advanceAmount || 0,       // ✅ ADD THIS
-    remainingAmount: bookingData.remainingAmount || 0,   // ✅ ADD THIS
+            const bookingPayload = {
+                name: bookingData.name || user.name,
+                email: bookingData.email || user.email,
+                phone: bookingData.phone || user.phone,
+                avatar: user.avatar || "",
+                checkin: bookingData.checkin,
+                checkout: bookingData.checkout,
+                nights,
+                paymentId: bookingData.paymentId,
+                specialRequest: bookingData.specialRequest || "",
+                totalAmount,
+                advanceAmount: bookingData.advanceAmount || 0,       // ✅ ADD THIS
+                remainingAmount: bookingData.remainingAmount || 0,   // ✅ ADD THIS
 
-    adults: bookingData.adults || 0,
-    kids: bookingData.kids || 0,
-    kidsAges: bookingData.kidsAges || [],
-    pets: bookingData.pets || 0,
-    extraChildCharge: bookingData.extraChildCharge || 0,
-    roomNames: selectedRooms.map(r => r.roomName).join(", "),
-    selectedRooms: selectedRooms.map((r) => ({
-        roomId: r.roomId,
-        roomName: r.roomName,
-        price: Number(r.price?.replace(/[^0-9]/g, "")) || 0,
-        images: r.images || [],
-        extraChildCharge: r.extraChildCharge || 0,
-    })),
-    status: "confirmed",
-};
+                adults: bookingData.adults || 0,
+                kids: bookingData.kids || 0,
+                kidsAges: bookingData.kidsAges || [],
+                pets: bookingData.pets || 0,
+                extraChildCharge: bookingData.extraChildCharge || 0,
+                roomNames: selectedRooms.map(r => r.roomName).join(", "),
+                selectedRooms: selectedRooms.map((r) => ({
+                    roomId: r.roomId,
+                    roomName: r.roomName,
+                    price: Number(r.price?.replace(/[^0-9]/g, "")) || 0,
+                    images: r.images || [],
+                    extraChildCharge: r.extraChildCharge || 0,
+                })),
+                status: "confirmed",
+            };
 
 
             console.log("Saving booking with payload:", bookingPayload);
             try {
                 const res = await axios.post(
-                    "http://localhost:5000/api/bookings",
+                    `${apiUrl}/api/bookings`,
                     bookingPayload
                 );
                 console.log("✅ Booking saved successfully:", res.data);
@@ -234,6 +234,16 @@ const Confirmbooking = () => {
                                         <p>Taxes & fees (18% GST)</p>
                                         <p>₹{taxes.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                                     </div>
+                                </div>
+                                <div className="flex justify-between font-medium text-blue-800">
+                                    <p>Advance Amount</p>
+                                    <p>₹{(bookingData.advanceAmount || 0).toLocaleString()}</p>
+                                </div>
+
+                                {/* Remaining Amount */}
+                                <div className="flex justify-between font-medium text-red-800">
+                                    <p>Remaining Amount</p>
+                                    <p>₹{(bookingData.remainingAmount || 0).toLocaleString()}</p>
                                 </div>
 
                                 <hr className="my-2 border-gray-300" />

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { User, LogOut, CheckCircle } from "lucide-react";
 import axios from "axios";
 
+const apiUrl = import.meta.env.VITE_API_URL;
 const Reservation = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ const Reservation = () => {
     if (!res) return alert("Razorpay SDK failed to load.");
 
     try {
-      const { data } = await axios.post("http://localhost:5000/api/payment/create-order", {
+      const { data } = await axios.post(`${apiUrl}/api/payment/create-order`, {
         amount: total, // from reservation
       });
 
@@ -79,7 +80,7 @@ const Reservation = () => {
         description: "Room Reservation Payment",
         order_id: order.id,
         handler: async function (response) {
-          const verify = await axios.post("http://localhost:5000/api/payment/verify", response);
+          const verify = await axios.post(`${apiUrl}/api/payment/verify`, response);
           if (verify.data.success) {
             setPaymentStatus(true);
             alert("✅ Payment Successful!");
@@ -189,7 +190,7 @@ const Reservation = () => {
         <img
           src={
             data.images && data.images.length > 0
-              ? `http://localhost:5000${data.images[0]}`
+              ? `${apiUrl}${data.images[0]}`
               : "/assets/home-bg.jpg"
           }
           alt={data.title}

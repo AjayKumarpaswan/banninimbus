@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-
+const apiUrl = import.meta.env.VITE_API_URL;
 const Rooms = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+
+
 
   const formData = location.state || {
     room: "",
@@ -25,7 +28,7 @@ const Rooms = () => {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/rooms");
+        const res = await axios.get(`${apiUrl}/api/rooms`);
         setRooms(res.data || []);
       } catch (error) {
         console.error("Error fetching rooms:", error);
@@ -35,6 +38,7 @@ const Rooms = () => {
     };
     fetchRooms();
   }, []);
+  
 
   // ✅ Calculate totals dynamically
   const totals = useMemo(() => {
@@ -183,7 +187,7 @@ const updateGuest = (type, delta) => {
         {images && images.length > 0 ? (
           <>
             <img
-              src={`http://localhost:5000${images[currentIndex]}`}
+              src={`${apiUrl}${images[currentIndex]}`}
               alt={title}
               className="w-full h-auto object-cover transition-all duration-700 rounded-lg"
             />
