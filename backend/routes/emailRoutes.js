@@ -6,6 +6,8 @@ const router = express.Router();
 
 router.post("/send-booking-confirmation", async (req, res) => {
   try {
+    // console.log("📩 API HIT:", req.body);
+
     // ✅ Send both email and WhatsApp in parallel
     await Promise.all([
       sendBookingEmail(req, res, true), // we pass true to skip res.send inside function

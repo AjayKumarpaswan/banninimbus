@@ -19,21 +19,19 @@ export const register = async (req, res) => {
     if (!name || !email || !password)
       return res.status(400).json({ message: "Missing fields" });
 
-    // ✅ If multer handled file upload, get image path
     const avatar = req.file ? `/uploads/avatars/${req.file.filename}` : "";
 
-    // Optional: check for existing user
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ message: "Email already exists" });
 
-    // ✅ Create user
+    // ⚠ You are storing password in plain text — kept as-is because you requested "no replacement"
     const user = new User({
       name,
       email,
       phone,
       role: role || "guest",
       password_hash: password,
-      avatar, // 🟢 store image path
+      avatar,
     });
 
     await user.save();
@@ -47,7 +45,7 @@ export const register = async (req, res) => {
         email: user.email,
         role: user.role,
         phone: user.phone,
-        avatar: user.avatar, // 🟢 return avatar URL
+        avatar: user.avatar,
       },
     });
   } catch (err) {
@@ -56,15 +54,14 @@ export const register = async (req, res) => {
   }
 };
 
-//check email exist or not
- export const checkemail=async (req, res) => {
+// check email exist or not
+export const checkemail = async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
   res.json({ exists: !!user });
 };
 
-// router.post("/check-email",
-
+// LOGIN
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -83,7 +80,7 @@ export const login = async (req, res) => {
         email: user.email,
         role: user.role,
         phone: user.phone,
-        avatar: user.avatar, // 🟢 send back avatar on login too
+        avatar: user.avatar,
       },
     });
   } catch (err) {
@@ -92,6 +89,7 @@ export const login = async (req, res) => {
   }
 };
 
+// DELETE USER
 export const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
@@ -105,14 +103,13 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-
+// GOOGLE LOGIN
 export const googleLogin = async (req, res) => {
   try {
-    const { token } = req.body; // token from frontend Google Login
+    const { token } = req.body;
 
     if (!token) return res.status(400).json({ message: "Token is required" });
 
-    // ✅ Verify Google token
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -121,22 +118,19 @@ export const googleLogin = async (req, res) => {
     const payload = ticket.getPayload();
     const { sub: googleId, email, name, picture: avatar } = payload;
 
-    // ✅ Check if user exists
     let user = await User.findOne({ email });
 
     if (!user) {
-      // If user doesn't exist, create a new one
       user = await User.create({
-        name: name || "No Name",        // use Google name
+        name: name || "No Name",
         email,
-        phone: "",                      // empty phone by default
-        role: "guest",                  // default role
-        password_hash: googleId,        // store Google ID as password_hash
-        avatar: avatar || "",           // Google avatar or empty string
+        phone: "",
+        role: "guest",
+        password_hash: googleId,
+        avatar: avatar || "",
       });
     }
 
-    // ✅ Create JWT token
     const jwtToken = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
@@ -149,7 +143,7 @@ export const googleLogin = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        phone: user.phone || "",      // include phone
+        phone: user.phone || "",
         role: user.role,
         avatar: user.avatar,
       },
@@ -159,3 +153,50 @@ export const googleLogin = async (req, res) => {
     res.status(500).json({ message: "Google login failed" });
   }
 };
+
+
+
+// ===============================
+// FORGOT PASSWORD
+// ===============================
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "Email not found" });
+
+    // not sending email... just verifying so user can proceed
+    return res.status(200).json({ message: "Email verified" });
+  } catch (err) {
+    console.error("Forgot error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+// ===============================
+// RESET PASSWORD
+// ===============================
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword)
+      return res.status(400).json({ message: "Missing fields" });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Respecting your broken existing storage
+    user.password_hash = newPassword;
+
+    await user.save();
+
+    return res.status(200).json({ message: "Password updated" });
+  } catch (err) {
+    console.error("Reset pass error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+

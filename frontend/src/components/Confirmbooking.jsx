@@ -64,10 +64,13 @@ const Confirmbooking = () => {
         };
 
         if (bookingData.email) {
+            // 🚨 FIX: Make sure these fields exist before sending email
+        bookingData.advanceAmount = bookingData.advanceAmount || 0;
+        bookingData.remainingAmount = bookingData.remainingAmount || 0;
             axios
                 .post(`${apiUrl}/api/send-booking-confirmation`, bookingData)
                 .then((res) => {
-                    console.log("📩 Booking confirmation email sent!");
+                    console.log("📩 Booking confirmation email sent! and what's app sent");
                     selectedRooms.forEach((room) => markRoomUnavailable(room.roomId));
                 })
                 .catch((err) => console.error(err));

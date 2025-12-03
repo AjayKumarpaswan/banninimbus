@@ -36,8 +36,8 @@ export const sendBookingWhatsApp = async (req, res, skipResponse = false) => {
     const taxes = totalBaseAmount * gstRate;
     const totalAmount = totalBaseAmount + taxes;
 
-   const advanceAmount = Number(booking.advanceAmount) || 0;
-const remainingAmount = Number(booking.remainingAmount) || 0;
+  const advanceAmount = ((totalAmount * 0.5).toFixed(2));
+    const remainingAmount = ((totalAmount - advanceAmount).toFixed(2));
 
 
     // Create WhatsApp message
@@ -58,8 +58,8 @@ Thank you for booking *${roomNames}* with *Baan Nimbus*! 🌿
 - Rooms: ₹${(nights * baseTotal).toLocaleString("en-IN")}  
 - Extra Child Charges: ₹${(nights * extraChildCharge).toLocaleString("en-IN")}  
 - Taxes & Fees (18% GST): ₹${taxes.toLocaleString("en-IN", { minimumFractionDigits: 2 })} 
-- Advance Payment: ₹${advanceAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}  
-- Remaining Amount to be paid: ₹${remainingAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}  
+- Advance Payment:  ₹${advanceAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} 
+- Remaining Amount to be paid:  ₹${remainingAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
 *Total Amount:* ₹${totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}  
 
 *Policies:*  

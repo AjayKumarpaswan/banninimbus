@@ -2,12 +2,13 @@ import nodemailer from "nodemailer";
 
 export const sendBookingEmail = async (req, res, skipResponse = false) => {
   try {
+    // console.log("📧 EMAIL BOOKING:", req.body);
+
     const booking = req.body;
     const selectedRooms = booking.selectedRooms || [];
 
+    console.log("booking", booking.email);
 
-    console.log("booking",booking.email)
-    // Room names separated by commas
     const roomNames = selectedRooms.map(r => r.roomName).join(", ");
 
     const checkinDate = new Date(booking.checkin).toLocaleDateString("en-IN");
@@ -17,16 +18,14 @@ export const sendBookingEmail = async (req, res, skipResponse = false) => {
       1,
       Math.ceil(
         (new Date(booking.checkout) - new Date(booking.checkin)) /
-        (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24)
       )
     );
 
-    // Total price calculation for all rooms combined
     const baseTotal = selectedRooms.reduce(
       (sum, room) => sum + (Number(room.price?.replace(/[^0-9]/g, "")) || 0),
       0
     );
-
 
     const extraChildCharge = booking.extraChildCharge || 0;
     const gstRate = 0.18;
@@ -36,34 +35,73 @@ export const sendBookingEmail = async (req, res, skipResponse = false) => {
     const taxes = totalBaseAmount * gstRate;
     const totalAmount = totalBaseAmount + taxes;
 
+    // ---- Added properly ----
+    const advanceAmount = ((totalAmount * 0.5).toFixed(2));
+    const remainingAmount = ((totalAmount - advanceAmount).toFixed(2));
+
+    booking.advanceAmount = advanceAmount;
+    booking.remainingAmount = remainingAmount;
+
     const priceDetailsHtml = `
       <h3 style="margin-top:20px; font-size:16px;">Price Details</h3>
       <table style="width:100%; border-collapse:collapse; font-size:14px; border:1px solid #ddd;" cellpadding="8">
         <tbody>
+
           <tr>
-  <td style="border-bottom:1px solid #eee;">
-    ${nights} Nights × ₹${baseTotal.toLocaleString()}
-  </td>
-  <td style="text-align:right; border-bottom:1px solid #eee;">
-    ₹${(nights * baseTotal).toLocaleString()}
-  </td>
-</tr>
-          <tr>
-            <td style="border-bottom:1px solid #eee;">${nights} Nights × ₹${extraChildCharge.toLocaleString()}</td>
-            <td style="text-align:right; border-bottom:1px solid #eee;">₹${(nights * extraChildCharge).toLocaleString()}</td>
+            <td style="border-bottom:1px solid #eee;">
+              ${nights} Nights × ₹${baseTotal.toLocaleString()}
+            </td>
+            <td style="text-align:right; border-bottom:1px solid #eee;">
+              ₹${(nights * baseTotal).toLocaleString()}
+            </td>
           </tr>
+
+          <tr>
+            <td style="border-bottom:1px solid #eee;">
+              ${nights} Nights × ₹${extraChildCharge.toLocaleString()}
+            </td>
+            <td style="text-align:right; border-bottom:1px solid #eee;">
+              ₹${(nights * extraChildCharge).toLocaleString()}
+            </td>
+          </tr>
+
           <tr>
             <td style="border-bottom:1px solid #eee;">Seasonal Discount</td>
-            <td style="text-align:right; border-bottom:1px solid #eee;">-₹${seasonalDiscount.toLocaleString()}</td>
+            <td style="text-align:right; border-bottom:1px solid #eee;">
+              -₹${seasonalDiscount.toLocaleString()}
+            </td>
           </tr>
+
           <tr>
             <td style="border-bottom:1px solid #eee;">Taxes & Fees (18% GST)</td>
-            <td style="text-align:right; border-bottom:1px solid #eee;">₹${taxes.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+            <td style="text-align:right; border-bottom:1px solid #eee;">
+              ₹${taxes.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </td>
           </tr>
+
+          
+
+          <tr>
+            <td style="border-bottom:1px solid #eee; font-weight:bold;">Advance Paid (50%)</td>
+            <td style="text-align:right; border-bottom:1px solid #eee; font-weight:bold;">
+              ₹${advanceAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </td>
+          </tr>
+
+          <tr>
+            <td style="border-bottom:1px solid #eee; font-weight:bold; color:#d00;">Remaining Amount</td>
+            <td style="text-align:right; border-bottom:1px solid #eee; font-weight:bold; color:#d00;">
+              ₹${remainingAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </td>
+          </tr>
+
           <tr style="font-weight:bold; background:#f6f6f6;">
             <td>Total INR</td>
-            <td style="text-align:right;">₹${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+            <td style="text-align:right;">
+              ₹${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </td>
           </tr>
+
         </tbody>
       </table>
     `;
@@ -100,8 +138,7 @@ export const sendBookingEmail = async (req, res, skipResponse = false) => {
           </ul>
 
           <p style="margin-top:20px; font-size:14px;">
-            For support, contact
-            <a href="mailto:support@baannimbus.in">support@baannimbus.in</a>
+            For support, contact <a href="mailto:support@baannimbus.in">support@baannimbus.in</a>
             or call <strong>8800990063</strong>.
           </p>
           <p>We look forward to hosting you!</p>

@@ -135,12 +135,12 @@ const BookingStep = () => {
     </section>
   );
 };
-
 export default BookingStep;
 
-/* ========================= POPUP ============================= */
+
+// guest popup
 const GuestPopup = ({ onClose, onSuccess }) => {
-  const [step, setStep] = useState("email"); // email → login or register
+  const [step, setStep] = useState("email"); 
   const [exists, setExists] = useState(false);
 
   const [form, setForm] = useState({
@@ -149,6 +149,7 @@ const GuestPopup = ({ onClose, onSuccess }) => {
     phone: "",
     password: "",
     avatar: null,
+    newPassword: "",
   });
 
   const [preview, setPreview] = useState(null);
@@ -171,10 +172,9 @@ const GuestPopup = ({ onClose, onSuccess }) => {
     setError("");
 
     try {
-      const res = await axios.post(
-        `${apiUrl}/api/auth/check-email`,
-        { email: form.email }
-      );
+      const res = await axios.post(`${apiUrl}/api/auth/check-email`, {
+        email: form.email,
+      });
 
       if (res.data.exists) {
         setExists(true);
@@ -195,13 +195,14 @@ const GuestPopup = ({ onClose, onSuccess }) => {
     setError("");
 
     try {
-      const res = await axios.post(
-        `${apiUrl}/api/auth/login`,
-        { email: form.email, password: form.password }
-      );
+      const res = await axios.post(`${apiUrl}/api/auth/login`, {
+        email: form.email,
+        password: form.password,
+      });
 
       localStorage.setItem("user", JSON.stringify(res.data.user));
       localStorage.setItem("token", res.data.token);
+
       onSuccess(res.data.user);
       alert("Logged in successfully!");
       onClose();
@@ -240,6 +241,7 @@ const GuestPopup = ({ onClose, onSuccess }) => {
 
       localStorage.setItem("user", JSON.stringify(data.user));
       localStorage.setItem("token", data.token);
+
       onSuccess(data.user);
       alert("Registered successfully!");
       onClose();
@@ -254,13 +256,11 @@ const GuestPopup = ({ onClose, onSuccess }) => {
   const handleGoogleLogin = async (credentialResponse) => {
     try {
       const token = credentialResponse.credential;
-      const res = await axios.post(
-        `${apiUrl}/api/auth/google`,
-        { token }
-      );
+      const res = await axios.post(`${apiUrl}/api/auth/google`, { token });
 
       localStorage.setItem("user", JSON.stringify(res.data.user));
       localStorage.setItem("token", res.data.token);
+
       onSuccess(res.data.user);
       alert("Logged in with Google!");
       onClose();
@@ -269,6 +269,44 @@ const GuestPopup = ({ onClose, onSuccess }) => {
     }
   };
 
+  /* ---------------- FORGOT PASSWORD ---------------- */
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      await axios.post(`${apiUrl}/api/auth/forgot-password`, {
+        email: form.email,
+      });
+
+      setStep("reset");
+    } catch (err) {
+      setError("Email not found");
+    }
+  };
+
+  /* ---------------- RESET PASSWORD ---------------- */
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await axios.post(`${apiUrl}/api/auth/reset-password`, {
+        email: form.email,
+        newPassword: form.newPassword,
+      });
+
+      alert("Password updated. Login again.");
+      setStep("login");
+    } catch (err) {
+      setError("Failed to reset password");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ---------------- UI ----------------
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-[999]">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md relative">
@@ -282,24 +320,78 @@ const GuestPopup = ({ onClose, onSuccess }) => {
         <h2 className="text-2xl font-bold mb-6 text-center text-green-800">
           {step === "email"
             ? "Enter Your Email"
-            : exists
+            : step === "login"
             ? "Login"
-            : "Register"}
+            : step === "register"
+            ? "Register"
+            : "Reset Password"}
         </h2>
 
         {error && <p className="text-red-500 text-center mb-3">{error}</p>}
 
-        {/* GOOGLE LOGIN */}
-        <div className="flex justify-center mb-4">
-          <GoogleLogin
-            onSuccess={handleGoogleLogin}
-            onError={() => setError("Google login failed")}
-          />
-        </div>
+        
+        {/* ------------------ RESET PASSWORD ------------------ */}
+        {step === "reset" && (
+          <form onSubmit={handleResetPassword} className="space-y-4">
+            <input
+              type="email"
+              value={form.email}
+              disabled
+              className="w-full p-3 border rounded bg-gray-100"
+            />
 
-        <div className="text-center text-gray-500 mb-4">OR</div>
+            <input
+              name="newPassword"
+              type="password"
+              placeholder="Enter new password"
+              className="w-full p-3 border rounded"
+              value={form.newPassword}
+              onChange={handleChange}
+              required
+            />
 
-        {/* STEP 1: EMAIL CHECK */}
+            <button className="w-full bg-green-700 text-white py-2 rounded-md hover:bg-green-800">
+              {loading ? "Saving..." : "Reset Password"}
+            </button>
+          </form>
+        )}
+
+        {/* ------------------ LOGIN ------------------ */}
+        {step === "login" && (
+          <>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <input
+                type="email"
+                value={form.email}
+                disabled
+                className="w-full p-3 border rounded bg-gray-100"
+              />
+
+              <input
+                name="password"
+                type="password"
+                placeholder="Password"
+                className="w-full p-3 border rounded"
+                value={form.password}
+                onChange={handleChange}
+                required
+              />
+
+              <button className="w-full bg-green-700 text-white py-2 rounded-md hover:bg-green-800">
+                {loading ? "Logging in..." : "Login"}
+              </button>
+            </form>
+
+            <button
+              onClick={() => setStep("reset")}
+              className="mt-3 text-sm text-green-700 underline text-center w-full"
+            >
+              Forgot password?
+            </button>
+          </>
+        )}
+
+        {/* ------------------ EMAIL STEP ------------------ */}
         {step === "email" && (
           <form onSubmit={checkEmail} className="space-y-4">
             <input
@@ -318,33 +410,7 @@ const GuestPopup = ({ onClose, onSuccess }) => {
           </form>
         )}
 
-        {/* LOGIN FORM */}
-        {step === "login" && (
-          <form onSubmit={handleLogin} className="space-y-4">
-            <input
-              type="email"
-              value={form.email}
-              disabled
-              className="w-full p-3 border rounded bg-gray-100"
-            />
-
-            <input
-              name="password"
-              type="password"
-              placeholder="Password"
-              className="w-full p-3 border rounded"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-
-            <button className="w-full bg-green-700 text-white py-2 rounded-md hover:bg-green-800">
-              {loading ? "Logging in..." : "Login"}
-            </button>
-          </form>
-        )}
-
-        {/* REGISTER FORM */}
+        {/* ------------------ REGISTER ------------------ */}
         {step === "register" && (
           <form onSubmit={handleRegister} className="space-y-4">
             <input
@@ -426,3 +492,4 @@ const GuestPopup = ({ onClose, onSuccess }) => {
     </div>
   );
 };
+
