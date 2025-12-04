@@ -18,6 +18,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import emailRoutes from "./routes/emailRoutes.js";
 import AbookingRoutes from "./routes/AdminBookingRoutes.js";
 import adminAuthRoutes from "./routes/adminAuthRoutes.js";
+import adminRoutesCheck from "./routes/adminRoutesCheck.js";
 connectDB();
 
 const app = express();
@@ -42,6 +43,8 @@ app.use("/api/payment", paymentRoutes);
 
 //for email
 app.use("/api", emailRoutes);
+
+app.use("/api/admincheck", adminRoutesCheck);
 
 // Health
 app.get("/", (req, res) => res.send("Baan Nimbus API"));

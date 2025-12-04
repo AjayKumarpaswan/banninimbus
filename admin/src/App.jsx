@@ -59,88 +59,88 @@ const App = () => {
       <Route
         path="/booking"
         element={
-          <ProtectedAdminRoute>
+   
             <DashboardLayout>
               <BookingCard />
             </DashboardLayout>
-          </ProtectedAdminRoute>
+      
         }
       />
 
       <Route
         path="/calendar"
         element={
-          <ProtectedAdminRoute>
+          
             <DashboardLayout>
               <Calender />
             </DashboardLayout>
-          </ProtectedAdminRoute>
+        
         }
       />
 
       <Route
         path="/listing"
         element={
-          <ProtectedAdminRoute>
+        
             <DashboardLayout>
               <Listing />
             </DashboardLayout>
-          </ProtectedAdminRoute>
+        
         }
       />
 
       <Route
         path="/messages"
         element={
-          <ProtectedAdminRoute>
+         
             <DashboardLayout>
               <Message />
             </DashboardLayout>
-          </ProtectedAdminRoute>
+       
         }
       />
 
       <Route
         path="/guests"
         element={
-          <ProtectedAdminRoute>
+         
             <DashboardLayout>
               <Guest />
             </DashboardLayout>
-          </ProtectedAdminRoute>
+          
         }
       />
 
       <Route
         path="/help"
         element={
-          <ProtectedAdminRoute>
+         
             <DashboardLayout>
               <Help />
             </DashboardLayout>
-          </ProtectedAdminRoute>
+       
         }
       />
 
       <Route
         path="/logout"
         element={
-          <ProtectedAdminRoute>
+       
             <DashboardLayout>
               <SignOut />
             </DashboardLayout>
-          </ProtectedAdminRoute>
+         
         }
       />
 
       <Route
         path="/account"
         element={
-          <ProtectedAdminRoute>
+         
             <DashboardLayout>
               <MyAccount />
             </DashboardLayout>
-          </ProtectedAdminRoute>
+         
         }
       />
 
