@@ -391,6 +391,13 @@ const GuestPopup = ({ onClose, onSuccess }) => {
           </>
         )}
 
+{/* GOOGLE LOGIN */} 
+
+<div className="flex justify-center mb-4">
+   <GoogleLogin onSuccess={handleGoogleLogin} 
+   onError={() => setError("Google login failed")}
+    />
+     </div>
         {/* ------------------ EMAIL STEP ------------------ */}
         {step === "email" && (
           <form onSubmit={checkEmail} className="space-y-4">
