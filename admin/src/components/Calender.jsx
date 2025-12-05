@@ -10,6 +10,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 
+const apiUrl = import.meta.env.VITE_API_URL;
 const Calendar = () => {
   const months = [
     "January",
@@ -41,12 +42,12 @@ const Calendar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const adminRes = await axios.get("http://localhost:5000/api/abookings");
-        const userRes = await axios.get("http://localhost:5000/api/bookings");
+        const adminRes = await axios.get(`${apiUrl}/api/abookings`);
+        const userRes = await axios.get(`${apiUrl}/api/bookings`);
         const combinedBookings = [...adminRes.data, ...userRes.data];
         setBookings(combinedBookings);
 
-        const roomRes = await axios.get("http://localhost:5000/api/rooms");
+        const roomRes = await axios.get(`${apiUrl}/api/rooms`);
         setRooms(roomRes.data);
 
         // Default select first room if none selected
@@ -96,17 +97,17 @@ const Calendar = () => {
     const fetchBookingsAndRooms = async () => {
       try {
         // ✅ Fetch admin bookings
-        const adminRes = await axios.get("http://localhost:5000/api/abookings");
+        const adminRes = await axios.get(`${apiUrl}/api/abookings`);
 
         // ✅ Fetch regular bookings
-        const userRes = await axios.get("http://localhost:5000/api/bookings");
+        const userRes = await axios.get(`${apiUrl}/api/bookings`);
 
         // ✅ Combine both bookings
         const combinedBookings = [...adminRes.data, ...userRes.data];
         setBookings(combinedBookings);
 
         // ✅ Fetch rooms
-        const roomRes = await axios.get("http://localhost:5000/api/rooms");
+        const roomRes = await axios.get(`${apiUrl}/api/rooms`);
         setRooms(roomRes.data);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -300,7 +301,7 @@ const Calendar = () => {
                 admin.avatar
                   ? admin.avatar.startsWith("http")
                     ? admin.avatar
-                    : `http://localhost:5000${admin.avatar}`
+                    : `${apiUrl}${admin.avatar}`
                   : "https://i.pravatar.cc/100?img=10"
               }
               alt={admin.name || "Profile"}
@@ -377,7 +378,7 @@ const Calendar = () => {
                         b.avatar
                           ? b.avatar.startsWith("http")
                             ? b.avatar
-                            : `http://localhost:5000${b.avatar}`
+                            : `${apiUrl}${b.avatar}`
                           : "https://i.pravatar.cc/100?img=1"
                       }
                       alt={b.name}
@@ -426,7 +427,7 @@ const Calendar = () => {
                         b.avatar
                           ? b.avatar.startsWith("http")
                             ? b.avatar
-                            : `http://localhost:5000${b.avatar}`
+                            : `${apiUrl}${b.avatar}`
                           : "https://i.pravatar.cc/100?img=1"
                       }
                       alt={b.name}

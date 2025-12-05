@@ -8,6 +8,7 @@ import {
   Clock,
   X,
 } from "lucide-react";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const BookingCard = () => {
   const [bookings, setBookings] = useState([]);
@@ -42,17 +43,17 @@ const [showGuestModal, setShowGuestModal] = useState(false);
     const fetchBookingsAndRooms = async () => {
       try {
         // ✅ Fetch admin bookings
-        const adminRes = await axios.get("http://localhost:5000/api/abookings");
+        const adminRes = await axios.get(`${apiUrl}/api/abookings`);
 
         // ✅ Fetch regular bookings
-        const userRes = await axios.get("http://localhost:5000/api/bookings");
+        const userRes = await axios.get(`${apiUrl}/api/bookings`);
 
         // ✅ Combine both bookings
         const combinedBookings = [...adminRes.data, ...userRes.data];
         setBookings(combinedBookings);
 
         // ✅ Fetch rooms
-        const roomRes = await axios.get("http://localhost:5000/api/rooms");
+        const roomRes = await axios.get(`${apiUrl}/api/rooms`);
         setRooms(roomRes.data);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -82,12 +83,12 @@ const [showGuestModal, setShowGuestModal] = useState(false);
     e.preventDefault();
     try {
       // 1️⃣ Create booking
-      const res = await axios.post("http://localhost:5000/api/abookings", formData);
+      const res = await axios.post(`${apiUrl}/api/abookings`, formData);
 
       // 2️⃣ Update room status to unavailable
       const selectedRoom = rooms.find(room => room.title === formData.roomName);
       if (selectedRoom) {
-        await axios.put(`http://localhost:5000/api/rooms/${selectedRoom._id}/status`, {
+        await axios.put(`${apiUrl}/api/rooms/${selectedRoom._id}/status`, {
           status: "unavailable",
         });
 
@@ -139,14 +140,14 @@ const [showGuestModal, setShowGuestModal] = useState(false);
     try {
       // ✅ Try deleting from admin bookings
       try {
-        await axios.delete(`http://localhost:5000/api/abookings/${bookingId}`);
+        await axios.delete(`${apiUrl}/api/abookings/${bookingId}`);
       } catch (err) {
         // ignore if not found in admin bookings
       }
 
       // ✅ Try deleting from user bookings
       try {
-        await axios.delete(`http://localhost:5000/api/bookings/${bookingId}`);
+        await axios.delete(`${apiUrl}/api/bookings/${bookingId}`);
       } catch (err) {
         // ignore if not found in user bookings
       }
@@ -157,7 +158,7 @@ const [showGuestModal, setShowGuestModal] = useState(false);
       // ✅ Update room status to available
       const deletedRoom = rooms.find(room => room.title === roomName);
       if (deletedRoom) {
-        await axios.put(`http://localhost:5000/api/rooms/${deletedRoom._id}/status`, {
+        await axios.put(`${apiUrl}/api/rooms/${deletedRoom._id}/status`, {
           status: "available",
         });
 
@@ -294,9 +295,9 @@ const [showGuestModal, setShowGuestModal] = useState(false);
                           booking.avatar
                             ? booking.avatar.startsWith("http")
                               ? booking.avatar
-                              : `http://localhost:5000${booking.avatar}`
+                              : `${apiUrl}${booking.avatar}`
                             : booking.images && booking.images.length > 0
-                              ? `http://localhost:5000${booking.images[0]}`
+                              ? `${apiUrl}${booking.images[0]}`
                               : "https://i.pravatar.cc/150?img=1"
                         }
                         alt={booking.name}
@@ -341,7 +342,7 @@ const [showGuestModal, setShowGuestModal] = useState(false);
                 admin.avatar
                   ? admin.avatar.startsWith("http")
                     ? admin.avatar
-                    : `http://localhost:5000${admin.avatar}`
+                    : `${apiUrl}${admin.avatar}`
                   : "https://i.pravatar.cc/100?img=10"
               }
               alt={admin.name || "Profile"}
@@ -420,7 +421,7 @@ const [showGuestModal, setShowGuestModal] = useState(false);
                         b.avatar
                           ? b.avatar.startsWith("http")
                             ? b.avatar
-                            : `http://localhost:5000${b.avatar}`
+                            : `${apiUrl}${b.avatar}`
                           : "https://i.pravatar.cc/100?img=1"
                       }
                       alt={b.name}
@@ -471,7 +472,7 @@ const [showGuestModal, setShowGuestModal] = useState(false);
                         b.avatar
                           ? b.avatar.startsWith("http")
                             ? b.avatar
-                            : `http://localhost:5000${b.avatar}`
+                            : `${apiUrl}${b.avatar}`
                           : "https://i.pravatar.cc/100?img=1"
                       }
                       alt={b.name}

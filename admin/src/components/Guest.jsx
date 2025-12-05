@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Mail, Phone, Bed, Calendar, Users } from "lucide-react";
-
+const apiUrl = import.meta.env.VITE_API_URL;
 const Guest = () => {
   const [guests, setGuests] = useState([]);
 
   useEffect(() => {
     const fetchGuests = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/bookings");
+        const res = await axios.get(`${apiUrl}/api/bookings`);
         setGuests(res.data);
       } catch (err) {
         console.error("Error fetching guests:", err);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { User } from "lucide-react";
-
+const apiUrl = import.meta.env.VITE_API_URL;
 const MyAccount = () => {
   const [admin, setAdmin] = useState(null);
 
@@ -38,7 +38,7 @@ const MyAccount = () => {
               src={
                 admin.avatar.startsWith("http")
                   ? admin.avatar
-                  : `http://localhost:5000${admin.avatar}`
+                  : `${apiUrl}${admin.avatar}`
               }
               alt={admin.name}
               className="w-full h-full object-cover"

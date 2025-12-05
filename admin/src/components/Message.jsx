@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Mail, Phone, Bed, Calendar } from "lucide-react";
 
+const apiUrl = import.meta.env.VITE_API_URL;
 const Message = () => {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/bookings");
+        const res = await axios.get(`${apiUrl}/api/bookings`);
         // Only keep bookings with specialRequest
         const specialRequests = res.data.filter(
           (booking) => booking.specialRequest && booking.specialRequest.trim() !== ""

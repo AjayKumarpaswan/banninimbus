@@ -9,6 +9,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 
+const apiUrl = import.meta.env.VITE_API_URL;
 const Listing = () => {
   const [rooms, setRooms] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -46,7 +47,7 @@ const [selectedRoomsToDelete, setSelectedRoomsToDelete] = useState([]);
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/rooms/admin");
+        const res = await axios.get(`${apiUrl}/api/rooms/admin`);
         setRooms(res.data);
       } catch (error) {
         console.error("Error fetching rooms:", error);
@@ -88,7 +89,7 @@ const [selectedRoomsToDelete, setSelectedRoomsToDelete] = useState([]);
     return (
       <div className="relative w-48 h-full rounded-xl overflow-hidden">
         <img
-          src={`http://localhost:5000${images[currentIndex]}`}
+          src={`${apiUrl}${images[currentIndex]}`}
           alt={`${title} - ${currentIndex + 1}`}
           className="w-full h-full object-cover transition-all duration-700 rounded-xl"
         />
@@ -126,7 +127,7 @@ const [selectedRoomsToDelete, setSelectedRoomsToDelete] = useState([]);
       });
 
       const res = await axios.post(
-        "http://localhost:5000/api/rooms",
+        `${apiUrl}/api/rooms`,
         formData,
         {
           headers: {
@@ -345,7 +346,7 @@ const [selectedRoomsToDelete, setSelectedRoomsToDelete] = useState([]);
                 admin.avatar
                   ? admin.avatar.startsWith("http")
                     ? admin.avatar
-                    : `http://localhost:5000${admin.avatar}`
+                    : `${apiUrl}${admin.avatar}`
                   : "https://i.pravatar.cc/100?img=10"
               }
               alt={admin.name || "Profile"}
@@ -579,7 +580,7 @@ const [selectedRoomsToDelete, setSelectedRoomsToDelete] = useState([]);
                 {editingRoom.images.map((img, index) => (
                   <div key={index} className="relative w-full h-24 rounded-lg overflow-hidden border border-gray-300">
                     <img
-                      src={`http://localhost:5000${img}`}
+                      src={`${apiUrl}${img}`}
                       alt={`room-${index}`}
                       className="w-full h-full object-cover"
                     />
@@ -652,7 +653,7 @@ const [selectedRoomsToDelete, setSelectedRoomsToDelete] = useState([]);
                   editingFiles.forEach((file) => formData.append("images", file));
 
                   const res = await axios.put(
-                    `http://localhost:5000/api/rooms/${editingRoom._id}`,
+                    `${apiUrl}/api/rooms/${editingRoom._id}`,
                     formData,
                     {
                       headers: { "Content-Type": "multipart/form-data" },
@@ -737,7 +738,7 @@ const [selectedRoomsToDelete, setSelectedRoomsToDelete] = useState([]);
           try {
             await Promise.all(
               selectedRoomsToDelete.map((id) =>
-                axios.delete(`http://localhost:5000/api/rooms/${id}`)
+                axios.delete(`${apiUrl}/api/rooms/${id}`)
               )
             );
 

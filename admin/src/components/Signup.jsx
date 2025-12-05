@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-
+const apiUrl = import.meta.env.VITE_API_URL;
 const Signup = () => {
   const navigate = useNavigate();
 
@@ -43,7 +43,7 @@ const Signup = () => {
       if (form.avatar) fd.append("avatar", form.avatar);
 
       const res = await axios.post(
-        "http://localhost:5000/api/admin/register",
+        `${apiUrl}/api/admin/register`,
         fd,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
