@@ -224,10 +224,10 @@ const updateGuest = (type, delta) => {
                 | Max Capacity 02
               </span>
             </h2>
-            <p className="flex items-center text-sm">
+            {/* <p className="flex items-center text-sm">
               <span className="text-black text-lg mr-1">★★★★★</span>
               {rating || "—"}
-            </p>
+            </p> */}
           </div>
 
           <p className="mt-2 text-gray-700 leading-relaxed">{description}</p>

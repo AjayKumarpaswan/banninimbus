@@ -355,7 +355,7 @@ const [selectedRoomsToDelete, setSelectedRoomsToDelete] = useState([]);
         </div>
       </div>
 
-      <main className="min-h-screen bg-[#083d2e] text-white p-6 rounded-3xl md:ml-64 transition-all duration-300">
+      <main className="min-h-screen bg-[#083d2e] text-white p-2 rounded-3xl md:ml-64 transition-all duration-300">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-semibold">Property</h1>

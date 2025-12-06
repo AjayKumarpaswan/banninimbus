@@ -146,10 +146,10 @@ const RoomCard = ({
                 | {String(index + 1).padStart(2, "0")}
               </span>
             </h2>
-            <p className="flex items-center text-sm">
+            {/* <p className="flex items-center text-sm">
               <span className="text-black text-lg mr-1">★★★★★</span>{" "}
               {rating || "—"}
-            </p>
+            </p> */}
           </div>
 
           <p className="mt-3 text-gray-700 leading-relaxed text-[15px]">
